@@ -1,0 +1,20 @@
+<tr class="new-row">
+    <th scope="row"> {{ numLastRow }} </th>
+    <td><input type="text" class="form-control newRowCategoryInput" placeholder="Nome Categoria"
+          {% if categoryName is not empty %} value="{{ categoryName }}" {% endif %} data-type="{{ type }}">
+    </td>
+    <td>
+        <select class="form-control">
+            <option value="1">Attivo</option>
+            <option value="0">Disattivo</option>
+        </select>
+    </td>
+    <td><button
+          {% if categoryName is not empty %}
+              class="saveEditCategory" data-categoryID="{{ categoryID }}"
+          {% else %}
+            class="saveNewCategory"
+          {% endif %}
+        > <i class="fas fa-check status-active"></i> Salva</button></td>
+    <td><button class="deleteNewCategory"><i class="fas fa-trash-alt trash"></i> Elimina</button></td>
+</tr>

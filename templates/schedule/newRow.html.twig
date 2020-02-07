@@ -1,0 +1,100 @@
+<tr class="new-row">
+  <th scope="row">{{ numLastRow }}</th>
+  <td>
+    <select class="form-control" name="category">
+      {% for category in categories %}
+        {% if categoryID is not empty and categoryID == category.id and category.status == 1 %}
+          <option value="{{ category.id }}" selected>{{ category.name }}</option>
+        {% elseif category.status == 1 %}
+          <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endif %}
+      {% endfor %}
+    </select>
+  </td>
+  <td>
+    <input type="text" class="form-control" name="description" placeholder="Descrizione"
+      {% if description is not empty %}
+        value="{{ description }}"
+      {% endif %}
+    >
+  </td>
+  <td>
+    <input type="number" class="form-control" name="amount" placeholder="Importo"
+      {% if amount is not empty %}
+        value="{{ amount }}"
+      {% endif %}
+    >
+  </td>
+  <td>
+    <select class="form-control" name="currency">
+      {% for currency in currencies %}
+        {% if currencyID is not empty and currencyID == currency.id %}
+          <option value="{{ currency.id }}" selected>{{ currency.symbol }}</option>
+        {% else %}
+          <option value="{{ currency.id }}">{{ currency.symbol }}</option>
+        {% endif %}
+      {% endfor %}
+    </select>
+  </td>
+  {% if firstInvoice is not empty %}
+    <td>
+      <div class='input-group date'>
+        <input type='text' class="form-control" name="firstInvoice" id='datetimepicker1'>
+      </div>
+    </td>
+  {% else %}
+    <td data-datetime="{{ 'now' | date('Y/m/d H:i') }}">
+      <div class='input-group date'>
+        <input type='text' class="form-control" name="firstInvoice" id='datetimepicker2'>
+      </div>
+    </td>
+  {% endif %}
+  <td>
+    <select name="cycle">
+      <option value="0" {% if cycle is same as('0') %} selected {% endif %}>Annuale</option>
+      <option value="1" {% if cycle is same as('1') %} selected {% endif %}>Mensile</option>
+      <option value="2" {% if cycle is same as('2') %} selected {% endif %}>Semestrale</option>
+    </select>
+  </td>
+  <td><button
+      {% if scheduleID is not empty %}
+        class="saveEditSchedule" data-schedule="{{ scheduleID }}"
+      {% else %}
+        class="saveNewSchedule"
+      {% endif %}
+      > <i class="fas fa-check status-active"></i> Salva</button></td>
+  <td><button class="deleteNewSchedule"><i class="fas fa-trash-alt trash"></i> Elimina</button></td>
+</tr>
+<script>
+  $('#datetimepicker1').datetimepicker({
+    defaultDate: new Date("{{ firstInvoice }}"),
+    format: 'DD/MM/YYYY',
+    sideBySide: false,
+    icons: {
+      previous: 'fas fa-angle-left',
+      next: 'fas fa-angle-right',
+      up: 'fas fa-angle-up',
+      down: 'fas fa-angle-down',
+    },
+    widgetPositioning: {
+      horizontal: 'right',
+      vertical: 'bottom'
+    }
+  });
+
+  $('#datetimepicker2').datetimepicker({
+    defaultDate: new Date(),
+    format: 'DD/MM/YYYY',
+    sideBySide: false,
+    icons: {
+      previous: 'fas fa-angle-left',
+      next: 'fas fa-angle-right',
+      up: 'fas fa-angle-up',
+      down: 'fas fa-angle-down',
+    },
+    widgetPositioning: {
+      horizontal: 'right',
+      vertical: 'bottom'
+    }
+  });
+</script>

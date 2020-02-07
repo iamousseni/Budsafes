@@ -1,0 +1,23 @@
+<div class="budsafes-budget-band" data-budget="{{ budget.id }}">
+  <div class="budsafes-budget-band-options">
+    <div class="btn-group dropleft">
+      <i class="fas fa-ellipsis-v " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+      <div class="dropdown-menu">
+        <ul>
+          <li data-budget="{{ budget.id }}" class="budsafes-rename-budget"><span>Rinomina</span></li>
+          <li data-budget="{{ budget.id }}" class="budsafes-delete-budget" data-toggle="modal" data-target="#exampleModal"><span>Elimina</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="budsafes-budget-band-name">
+    <a href="{{ path('app_budget_schedule', {budgetID: budget.id}) }}"><h1>{{ budget.name }}</h1></a>
+  </div>
+  <div class="budsafes-budget-band-active">
+    {% if budget.active == 1 %}
+      <i class="fas fa-star star star-active"></i>
+    {% else %}
+      <i class="fas fa-star star star-inactive"></i>
+    {% endif %}
+  </div>
+</div>

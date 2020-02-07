@@ -1,0 +1,13 @@
+{% for category in categories %}
+  <tr>
+    <th scope="row">{{ loop.index }}</th>
+    <td>{{ category.name }}</td>
+    {% if category.status is same as(1) %}
+      <td data-status="{{ category.status }}"><i class="fas fa-circle status-active"></i> <span> Attivo</span></td>
+    {% else %}
+      <td data-status="{{ category.status }}"><i class="fas fa-circle status-inactive"></i> <span> Disattivo</span></td>
+    {% endif %}
+    <td class="editCategory" data-categoryID="{{ category.id }}" data-budgetID="{{ budgetID }}" data-type="{{ category.type }}"><i class="far fa-edit edit"></i></td>
+    <td class="deleteCategory" data-toggle="modal" data-target="#exampleModal" data-categoryID="{{ category.id }}" data-budgetID="{{ budgetID }}" data-type="{{ category.type }}"><i class="fas fa-trash-alt trash"></i></td>
+  </tr>
+{% endfor %}

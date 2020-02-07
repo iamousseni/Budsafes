@@ -1,0 +1,21 @@
+{% for businessTraffic in businessTraffics %}
+  <tr data-businessTraffic="{{ businessTraffic.id }}">
+    <th scope="row">{{ loop.index }}</th>
+    <td data-categoryid="{{ businessTraffic.category.id }}">{{ businessTraffic.category.name }}</td>
+    <td>{{ businessTraffic.description }}</td>
+    <td>{{ businessTraffic.amount | number_format(2, ',', '.') }}</td>
+    <td>{{ businessTraffic.currency.symbol }}</td>
+    <td data-type="{{ businessTraffic.category.type }}">
+      {% if businessTraffic.category.type == "0" %}
+        Entrata <i class="fas fa-arrow-up income"></i>
+      {% elseif businessTraffic.category.type == "1" %}
+        Uscita <i class="fas fa-arrow-down outcome"></i>
+      {% elseif businessTraffic.category.type == "2" %}
+        Risparmio <i class="fas fa-piggy-bank piggyBank"></i>
+      {% endif  %}
+    </td>
+    <td data-added="{{ businessTraffic.added.date | date('Y/m/d H:i') }}">{{ businessTraffic.added.date | date('d/m/Y H:i') }}</td>
+    <td class="editBusinessTraffic"><i class="far fa-edit edit"></i></td>
+    <td class="deleteBusinessTraffic" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-trash-alt trash"></i></td>
+  </tr>
+{% endfor %}

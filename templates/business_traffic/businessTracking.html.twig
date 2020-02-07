@@ -1,0 +1,465 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Sei sicuro di voler cancellare questa Business Track?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex align-items-center justify-content-center">
+            <div class="mr-3 modal-delete-image-container">
+              <img src="https://media2.giphy.com/media/3oz8y0bx23FDPCNoEU/giphy.gif">
+            </div>
+            <div>
+              <p class="modal-delete-text">Ti ricordo che questa operazione è irreversibile, pertanto proseguendo non sarà
+              più possibile tornare indietro!</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Non cancellare questa Business Track</button>
+          <button type="button" class="btn btn-danger" id="confirm-delete-business-traffic" data-dismiss="modal">Cancella questa Business Track</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="newBuinessTrackModal" tabindex="-1" role="dialog" aria-labelledby="newBuinessTrackModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="newBuinessTrackModalLabel">Aggiungi Business Track</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <span class="result-message font-weight-bold"></span>
+          <form id="form-add-new-business-track">
+            <div class="form-group">
+              <label for="exampleFormControlInput1">Categoria</label>
+              <select class="form-control" name="category" id="exampleFormControlInput1">
+                {% for category in categories %}
+                  {% if category.status == 1 %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="exampleFormControlSelect1">Descrizione</label>
+              <input type="text" name="description" class="form-control" id="exampleFormControlSelect1">
+            </div>
+            <div class="form-group">
+              <label for="exampleFormControlSelect2">Importo</label>
+              <input type="number" class="form-control" name="amount" min="0" placeholder="Importo">
+            </div>
+            <div class="form-group">
+              <label for="exampleFormControlSelect3">Valuta</label>
+              <select class="form-control" name="currency" id="exampleFormControlSelect3">
+                {% for currency in currencies %}
+                  <option value="{{ currency.id }}">{{ currency.symbol }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <input type="hidden" name="added" value="{{ 'now' | date('Y/m/d H:i') }}">
+          </form>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Non aggiungere Business Track</button>
+          <button type="button" class="btn btn-danger" id="add-new-businessTrack">Aggiungi Business Track</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% if businessTrafficsData is not empty %}
+  <div class="budsafes-business-track-views">
+    <ul class="nav nav-pills nav-fill">
+      <li class="nav-item">
+        <button type="button" id="business-tracking-current-month" class="btn btn-primary btn-lg btn-block" data-month="{{ 'now' | date('m') }}">
+          <i></i>Corrente
+        </button>
+      </li>
+      <li class="nav-item">
+        <button type="button" class="btn btn-outline-primary btn-lg btn-block" id="percentuals-spent">
+          Percentuali <i class="fas fa-balance-scale-left"></i>
+        </button>
+      </li>
+      <li class="nav-item">
+        <div class="input-group">
+          <select class="custom-select" id="business-tracking-months">
+            <option value="0">Tutti i mesi</option>
+            {% for month, businessTraffic in businessTrafficsData %}
+              {% if month | date('m') == "now" | date('m') %}
+                <option value="{{ "now" | date('m') }}" selected>{{ "now" | date('F') }}</option>
+              {% else %}
+                <option value="{{ month | date('m') }}">{{ month | date('F') }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="budsafes-business-track-container">
+    {% for month, businessTraffics in businessTrafficsData | slice(0, 2) %}
+    <div class="budsafes-business-track">
+      {% if month is not empty %}
+      <p class="budsafes-business-track-month" data-month="{{ month | date('m') }}">
+          {{ month | date('F') }}
+      </p>
+      {% endif %}
+      <span class="result-message font-weight-bold"></span>
+        <table class="table">
+          <thead class="thead-light">
+          <tr>
+            <th colspan="8">Business tracking</th>
+            <th class="p-0">
+              {% if month | date('m') == "now" | date('m') %}
+              <button class="budsafes-business-track-add-button business-tracking">+</button>
+              {% endif %}
+            </th>
+          </tr>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Descrizione</th>
+            <th scope="col">Importo</th>
+            <th scope="col">Valuta</th>
+            <th scope="col">Tipologia</th>
+            <th scope="col">Data ora aggiunta</th>
+            <th scope="col">Modifica</th>
+            <th scope="col">Elimina</th>
+          </tr>
+          </thead>
+          <tbody>
+          {% for businessTraffic in businessTraffics %}
+            <tr data-businessTraffic="{{ businessTraffic.id }}">
+              <th scope="row">{{ loop.index }}</th>
+              <td data-categoryid="{{ businessTraffic.category.id }}">{{ businessTraffic.category.name }}</td>
+              <td>{{ businessTraffic.description }}</td>
+              <td>{{ businessTraffic.amount | number_format(2, ',', '.') }}</td>
+              <td>{{ businessTraffic.currency.symbol }}</td>
+              <td data-type="{{ businessTraffic.category.type }}">
+                {% if businessTraffic.category.type == "0" %}
+                  Entrata <i class="fas fa-arrow-up income"></i>
+                {% elseif businessTraffic.category.type == "1" %}
+                  Uscita <i class="fas fa-arrow-down outcome"></i>
+                {% elseif businessTraffic.category.type == "2" %}
+                  Risparmio <i class="fas fa-piggy-bank piggyBank"></i>
+                {% endif  %}
+              </td>
+              <td data-added="{{ businessTraffic.added.date | date('Y/m/d H:i') }}">{{ businessTraffic.added.date | date('d/m/Y H:i') }}</td>
+              <td class="editBusinessTraffic"><i class="far fa-edit edit"></i></td>
+              <td class="deleteBusinessTraffic" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-trash-alt trash"></i></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endblock %}
+{% block javascripts %}
+  {{ parent() }}
+  <script src="{{ asset('assets/js/Budsafes.js') }}"></script>
+  <script>
+    $(document).ready(function () {
+      let budsafes = new Budsafes();
+      
+      $(document).on('click', '.budsafes-business-track-add-button.business-tracking', function () {
+        let elementToAppend = $(this).parent().parent().parent().next();
+        let URLNewRow = "{{ path('app_budsafes_new_row_business_tracking') }}";
+        let numLastRow = Number($.trim(elementToAppend.children('tr').last().children('th').first().text()));
+        let container = $('.budsafes-business-track-container');
+        let criteria = {
+          numLastRow: numLastRow + 1,
+          budget: {{ budget.id }},
+        };
+        budsafes.newRow(elementToAppend, URLNewRow, criteria);
+      });
+      
+      $(document).on('click', '.saveNewBusinessTrack', function () {
+        $('.saveNewBusinessTrack').each(function (index) {
+          let elementToAppend = $(this).parent().parent().parent();
+          let newRow = $(this).parent().parent();
+          let outputElement = elementToAppend.parent().prev();
+          let month = outputElement.prev().attr('data-month');
+          let categoryID = newRow.find('[name=category]').val();
+          let description = newRow.find('[name=description]').val();
+          let amount = newRow.find('[name=amount]').val();
+          let currency = newRow.find('[name=currency]').val();
+          let datetime = newRow.find('input.datetimepicker2').val();
+          datetime = datetime.split(' ');
+          datetime = datetime[0].split('/').reverse().join('/') +' '+datetime[1];
+          let URLNewRow = "{{ path('app_budsafes_new_business_tracking') }}";
+
+          let criteria = {
+            idCategory: categoryID,
+            idCurrency: currency,
+            amount: amount,
+            description: description,
+            added: datetime,
+            budget: {{ budget.id }},
+            month: month
+          };
+
+          budsafes.saveNewRow(elementToAppend, outputElement, URLNewRow, criteria);
+        });
+      });
+      
+      $('#add-new-businessTrack').click(function () {
+        let form = $('#form-add-new-business-track');
+        let elementToAppend = $('.budsafes-business-track-container');
+        let outputElement = $(this).parent().parent().find('span.result-message');
+        let categoryID = form.find('[name=category]').val();
+        let description = form.find('[name=description]').val();
+        let amount = form.find('[name=amount]').val();
+        let currency = form.find('[name=currency]').val();
+        let datetime = form.find('[name=added]').val();
+        let URLNewRow = "{{ path('app_budsafes_new_business_tracking') }}";
+        
+        let date = new Date();
+        let month = date.getMonth() + 1;
+
+        let criteria = {
+          idCategory: categoryID,
+          idCurrency: currency,
+          amount: amount,
+          description: description,
+          added: datetime,
+          budget: {{ budget.id }},
+          month: month,
+        };
+
+        budsafes.saveNewRow(elementToAppend, outputElement, URLNewRow, criteria, true);
+      });
+
+      $(document).on('click', '.editBusinessTraffic', function (){
+        let elementToReplace = $(this).parent();
+        let URLEditRow = "{{ path('app_budsafes_new_row_business_tracking') }}";
+        let categoryID = elementToReplace.find('[data-categoryid]');
+        let description = categoryID.next();
+        let amount = description.next();
+        let currency = amount.next();
+        let datetime = elementToReplace.find('[data-added]');
+        let businessTrafficID = elementToReplace.attr('data-businessTraffic');
+        let numLastRow = elementToReplace.find('th[scope=row]').text();
+        let criteria = {
+          numLastRow: numLastRow,
+          categoryID: categoryID.attr('data-categoryid'),
+          currencyID: currency.text(),
+          amount: amount.text(),
+          description: description.text(),
+          dateAdded: datetime.attr('data-added'),
+          budget: "{{ budget.id }}",
+          businessTrafficID: businessTrafficID,
+        };
+        
+        budsafes.editRow(elementToReplace, URLEditRow, criteria);
+      });
+
+      $(document).on('click', '.saveEditBusinessTrack', function (){
+        $('.saveEditBusinessTrack').each(function () {
+            let businessTrafficID = $(this).attr('data-businessTraffic');
+            let newRow = $(this).parent().parent();
+            let elementToAppend = $(this).parent().parent().parent();
+            let outputElement = elementToAppend.parent().prev();
+            let month = outputElement.prev().attr('data-month');
+            let categoryID = newRow.find('[name=category]').val();
+            let description = newRow.find('[name=description]').val();
+            let amount = newRow.find('[name=amount]').val();
+            let currency = newRow.find('[name=currency]').val();
+            let datetime = newRow.find('input.datetimepicker1').val();
+            datetime = datetime.split(' ');
+            datetime = datetime[0].split('/').reverse().join('/') +' '+datetime[1];
+
+            let URLNewRow = "{{ path('app_budsafes_edit_business_traffic') }}";
+
+            let criteria = {
+              id: businessTrafficID,
+              idCategory: categoryID,
+              idCurrency: currency,
+              amount: amount,
+              description: description,
+              added: datetime,
+              budget: {{ budget.id }},
+              month: month
+            };
+
+          budsafes.saveNewRow(elementToAppend, outputElement, URLNewRow, criteria);
+        });
+      });
+
+      $(document).on('click', '.deleteNewBusinessTrack', function () {
+        let elementContainer = $(this).parent().parent();
+        budsafes.deleteNewRow(elementContainer);
+      });
+
+      $(document).on('click', '.deleteBusinessTraffic', function (event){
+        let elementToDelete = $(this).parent();
+        let businessTrafficIndexOf = $('tr').index(elementToDelete);
+        let outputElement = elementToDelete.parent().parent().prev();
+        let outputElementIndexOf = $('span.result-message').index(outputElement);
+
+        let confirmDeleteElement = $('#confirm-delete-business-traffic');
+        confirmDeleteElement.attr('data-businessTraffic', businessTrafficIndexOf);
+        confirmDeleteElement.attr('data-elementToDelete', businessTrafficIndexOf);
+        confirmDeleteElement.attr('data-outputElement', outputElementIndexOf);
+
+      });
+
+      $(document).on('click', '#confirm-delete-business-traffic', function () {
+        let URLDeleteRow = "{{ path('app_budsafes_delete_business_traffic') }}";
+        let businessTraffic = $($('tr').get($(this).attr('data-businessTraffic'))).attr('data-businesstraffic');
+        let elementoToDelete = $($('tr').get($(this).attr('data-elementToDelete')));
+        let outputElement = $($('span.result-message').get($(this).attr('data-outputElement')));
+        
+        let criteria = {
+          id: businessTraffic,
+        };
+
+        budsafes.deleteRow(elementoToDelete, outputElement, URLDeleteRow, criteria);
+      });
+      
+      $('#business-tracking-months').change(function () {
+        let elementToAppend = $('.budsafes-business-track-container');
+        let outputElement = $('span.result-message').first();
+        let URLBusinessTrafficDataMonth = "{{ path('app_budsafes_generate_business_tracking_data_month') }}";
+        let month = $(this).val();
+        
+        let criteria = {
+          month: month
+        };
+        
+        budsafes.returnTableData(elementToAppend, outputElement, URLBusinessTrafficDataMonth, criteria);
+      });
+      
+      $('#business-tracking-current-month').click(function () {
+        let elementToAppend = $('.budsafes-business-track-container');
+        let outputElement = $('span.result-message').first();
+        let URLBusinessTrafficDataMonth = "{{ path('app_budsafes_generate_business_tracking_data_month') }}";
+        let month = $(this).attr('data-month');
+
+        let criteria = {
+          month: month
+        };
+
+        budsafes.returnTableData(elementToAppend, outputElement, URLBusinessTrafficDataMonth, criteria);
+      });
+
+      $('#percentuals-spent').click(function () {
+        let elementToAppend = $('.budsafes-business-track-container');
+        let outputElement = $('span.result-message');
+        let URLPercentualSpent = "{{ path('app_business_taffic_percentual_spent') }}";
+        let month = $('#percentual-spent-months').val();
+        if(month == null){
+          month = new Date();
+          month = month.getMonth() + 1;
+        }
+
+        let criteria = {
+          id: {{ budget.id }},
+          param: null,
+          month: month,
+        };
+
+        budsafes.percentualSpent(elementToAppend, outputElement, URLPercentualSpent, criteria);
+      });
+
+      $(document).on('click', '#all-percentual',function () {
+        let elementToAppend = $('.budsafes-business-track-container');
+        let outputElement = $('span.result-message');
+        let URLPercentualSpent = "{{ path('app_business_taffic_percentual_spent') }}";
+        let month = $('#percentual-spent-months').val();
+        if(month == null){
+          month = new Date();
+          month = month.getMonth() + 1;
+        }
+        let criteria = {
+          id: {{ budget.id }},
+          param: null,
+          month: month,
+        };
+
+        budsafes.percentualSpent(elementToAppend, outputElement, URLPercentualSpent, criteria);
+      });
+
+      $(document).on('click', '#income-percentual',function () {
+        let elementToAppend = $('.budsafes-business-track-container');
+        let outputElement = $('span.result-message');
+        let URLPercentualSpent = "{{ path('app_business_taffic_percentual_spent') }}";
+        let month = $('#percentual-spent-months').val();
+        if(month == null){
+          month = new Date();
+          month = month.getMonth() + 1;
+        }
+        let criteria = {
+          id: {{ budget.id }},
+          param: '0',
+          month: month,
+        };
+
+        budsafes.percentualSpent(elementToAppend, outputElement, URLPercentualSpent, criteria);
+      });
+
+      $(document).on('click', '#outcome-percentual',function () {
+        let elementToAppend = $('.budsafes-business-track-container');
+        let outputElement = $('span.result-message');
+        let URLPercentualSpent = "{{ path('app_business_taffic_percentual_spent') }}";
+        let month = $('#percentual-spent-months').val();
+        if(month == null){
+          month = new Date();
+          month = month.getMonth() + 1;
+        }
+        let criteria = {
+          id: {{ budget.id }},
+          param: 1,
+          month: month,
+        };
+
+        budsafes.percentualSpent(elementToAppend, outputElement, URLPercentualSpent, criteria);
+      });
+
+      $(document).on('click', '#saves-percentual',function () {
+        let elementToAppend = $('.budsafes-business-track-container');
+        let outputElement = $('span.result-message');
+        let URLPercentualSpent = "{{ path('app_business_taffic_percentual_spent') }}";
+        let month = $('#percentual-spent-months').val();
+        if(month == null){
+          month = new Date();
+          month = month.getMonth() + 1;
+        }
+        let criteria = {
+          id: {{ budget.id }},
+          param: 2,
+          month: month,
+        };
+
+        budsafes.percentualSpent(elementToAppend, outputElement, URLPercentualSpent, criteria);
+      });
+
+      $(document).on('change', '#percentual-spent-months', function () {
+        let elementToAppend = $('.budsafes-business-track-container');
+        let outputElement = $('span.result-message');
+        let URLPercentualSpent = "{{ path('app_business_taffic_percentual_spent') }}";
+        let month = $(this).val();
+        let criteria = {
+          id: {{ budget.id }},
+          param: null,
+          month: month,
+        };
+
+        budsafes.percentualSpent(elementToAppend, outputElement, URLPercentualSpent, criteria);
+      });
+      
+    });
+    
+  </script>
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+  
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Sei sicuro di voler cancellare questa Budget?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex align-items-center justify-content-center">
+            <div class="mr-3 modal-delete-image-container">
+              <img src="https://media2.giphy.com/media/3oz8y0bx23FDPCNoEU/giphy.gif">
+            </div>
+            <div>
+              <p class="modal-delete-text">Cancellando questo Budget cancellerai anche tutti i dati della Business Traffic e
+                delle Schedule che richiedevano questo Budget!</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Non cancellare questo Budget</button>
+          <button type="button" class="btn btn-danger" id="confirm-delete-budget" data-dismiss="modal">Cancella questo Budget</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="newBudgetModal" tabindex="-1" role="dialog" aria-labelledby="newBudgetModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="newBudgetModalLabel">Aggiungi nuovo Budget</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <span class="result-message font-weight-bold"></span>
+          <form id="form-add-new-category">
+            <div class="form-group">
+              <label for="exampleFormControlInput1">Nome Budget</label>
+              <input type="text" class="form-control" id="exampleFormControlInput1" name="budgetName" placeholder="Nome Budget" autocomplete="off" required>
+            </div>
+            <div class="form-group">
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="active" id="exampleCheck1" value="0">
+                <label class="form-check-label" for="exampleCheck1">Imposta come predefinito</label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Non aggiungere nuovo Budget</button>
+          <button type="button" class="btn btn-danger" id="add-new-budget" data-dismiss="modal">Aggiungi nuovo Budget</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="budsafes-budgets-bands-container">
+    <span class="result-message text-center mt-1 d-block fs-18 font-weight-bold"></span>
+  {% for budget in budgets %}
+      <div class="budsafes-budget-band" data-budget="{{ budget.id }}">
+        <div class="budsafes-budget-band-options">
+          <div class="btn-group dropleft">
+            <i class="fas fa-ellipsis-v " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+            <div class="dropdown-menu">
+              <ul>
+                <li data-budget="{{ budget.id }}" class="budsafes-rename-budget"><span>Rinomina</span></li>
+                <li data-budget="{{ budget.id }}" class="budsafes-delete-budget" data-toggle="modal" data-target="#exampleModal"><span>Elimina</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="budsafes-budget-band-name">
+          <a href="{{ path('app_budget_schedule', {budgetID: budget.id}) }}"><h1>{{ budget.name }}</h1></a>
+        </div>
+        <div class="budsafes-budget-band-active">
+          {% if budget.active == 1 %}
+            <i class="fas fa-star star star-active"></i>
+          {% else %}
+            <i class="fas fa-star star star-inactive"></i>
+          {% endif %}
+        </div>
+      </div>
+  {% endfor %}
+  </div>
+  
+{% endblock %}
+{% block javascripts %}
+  {{ parent() }}
+  <script src="{{ asset('assets/js/Budsafes.js') }}"></script>
+  <script>
+    $(document).ready(function () {
+      let budsafes = new Budsafes();
+      
+      $(document).on('click', '#add-new-budget',  function () {
+        let elementToAppend = $('.budsafes-budgets-bands-container');
+        let outputElement = $('span.result-message');
+        let URLNewBudget = "{{ path('app_budget_new') }}";
+        let formAddBudget = $('#form-add-new-category');
+        let budgetName = formAddBudget.find('[name=budgetName]').val();
+        let active = formAddBudget.find('[name=active]');
+        if(active.is(':checked')){
+          active = 1;
+        }else {
+          active = 0;
+        }
+        
+        let user = 1;
+        let criteria = {
+          budgetName: budgetName,
+          user: user,
+          active: active
+        };
+        
+        budsafes.saveNewBudget(elementToAppend, outputElement, URLNewBudget, criteria);
+        
+      });
+      $(document).on('click', '.star', function () {
+        let URLBudgetActive = "{{ path('app_budget_active') }}";
+        let budgetID = $(this).parent().parent().attr('data-budget');
+        let criteria = {
+          budget: budgetID,
+        };
+        
+        budsafes.activeBudget($(this), URLBudgetActive, criteria);
+      });
+      
+      $(document).on('click', '.budsafes-rename-budget', function () {
+        let bandNameContainerElement = $(this).parent().parent().parent().parent().next();
+        let bandNameElement = bandNameContainerElement.find('h1');
+        
+        bandNameElement.css('border', '2px dashed grey');
+        bandNameElement.attr('contenteditable', 'true');
+        bandNameElement.attr('data-budget', $(this).attr('data-budget'));
+      });
+
+      $(document).on('click', '.budsafes-budget-band-name a h1', function (event) {
+        if($(this).attr('contenteditable') === 'true') {
+          event.preventDefault();
+          
+          $(this).focusout(function () {
+            let elementToRename = $(this);
+            let budgetName = elementToRename.text();
+            let outputElement = $('.result-message');
+            let URLRenameBudget = "{{ path('app_budget_rename') }}";
+            let budgetID = elementToRename.attr('data-budget');
+            let criteria = {
+              id: budgetID,
+              budgetName: budgetName
+            };
+            
+            budsafes.renameBudget(elementToRename, outputElement, URLRenameBudget, criteria);
+          });
+        }
+      });
+
+      $(document).on('click', '#confirm-delete-budget', function(){
+        let URLDeleteBudget = "{{ path('app_budget_delete') }}";
+        let elementToDelete = $($('.budsafes-budget-band').get($(this).attr('data-elementToDelete')));
+        let budgetID = elementToDelete.attr('data-budget');
+        let outputElement = $('.result-message');
+
+        let criteria = {
+          id: budgetID,
+        };
+
+        budsafes.deletebudget(elementToDelete, outputElement, URLDeleteBudget, criteria);
+      });
+      
+      $(document).on('click', '.budsafes-delete-budget', function(){
+        let budgetID = $(this).attr('data-budget');
+        let elementToDelete =  $('.budsafes-budget-band[data-budget='+budgetID+']');
+        let elementToDeleteIndex = $('.budsafes-budget-band').index(elementToDelete);
+        $('#confirm-delete-budget').attr('data-elementToDelete', elementToDeleteIndex);
+      })
+    });
+  </script>
+{% endblock %}

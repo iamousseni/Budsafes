@@ -1,0 +1,186 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+<div class="budsafes-category-container">
+    <div>
+        <a href="{{ path('app_budget_schedule', {budgetID: budget.id} ) }}"> <button class="btn btn-outline-secondary rounded-button m-2"><i class="fas fa-arrow-left"></i> Back </button> </a>
+        <a href="{{ path('app_budget_category', { budgetName: budget.name | lower , budget_id: budget.id } ) }}"> <button class="btn btn-primary rounded-button m-2">Categorie dello Schedule</button> </a>
+        <ul class="nav nav-pills budsfes-chart-preview-setting">
+            <li class="nav-item"><button class="btn btn-outline-success rounded-button preview-dataType" id="chart-income-preview" data-categorytype="0">Entrate <i class="fas fa-arrow-up income"></i></button></li>
+            <li class="nav-item"><button class="btn btn-outline-danger rounded-button preview-dataType" id="chart-outcome-preview" data-categorytype="1">Uscite <i class="fas fa-arrow-down outcome"></i></button></li>
+            <li class="nav-item"><button class="btn btn-outline-piggyBank rounded-button preview-dataType" id="chart-income-preview" data-categorytype="2">Risparmi <i class="fas fa-piggy-bank piggyBank"></i></button></li>
+        </ul>
+        <div class="budsafes-small-text">
+            <small>I grafici qui sotto si riferiscono a dati mensili</small>
+        </div>
+    </div>
+    <div class="budsafes-chart-preview-container">
+        <span class="result-message font-weight-bold"></span>
+        <div class="budsafes-chart-preview-income">
+            <div class="budsafes-chart-preview-data">
+                <h1 class="budsafes-chart-preview-category-name"></h1>
+                <div class="budsafes-chart-preview-cashRemain-month">
+                    <span>Cash rimanente mensile: </span><span class="font-weight-bold"></span>
+                </div>
+                <div class="budsafes-chart-preview-cashRemain-year">
+                    <span>Cash rimanente annuo: </span><span class="font-weight-bold"></span>
+                </div>
+                <div class="budsafes-chart-preview-totalMonth">
+                    <span>Totale Mensili: </span><span class="font-weight-bold"></span>
+                </div>
+                <div class="budsafes-chart-preview-totalYear">
+                    <span>Totale Annuali: </span><span class="font-weight-bold"></span>
+                </div>
+            </div>
+            <div class="budsafes-chart-preview-canvas">
+                <div class="chart-container" style="position: relative; height:40vh; width:80vw">
+                    <canvas id="myChart" width="400px" height="400px"></canvas>
+                </div>
+                <div class="chart-container" style="position: relative; height:40vh; width:80vw">
+                    <canvas id="myChart1" width="400px" height="400px"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block javascripts %}
+{{ parent() }}
+<script src="{{ asset('https://cdn.jsdelivr.net/npm/chart.js@2.8.0') }}"></script>
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var config = {
+        type: 'bar',
+        data: {
+            labels: [''],
+            datasets: [{
+                label: '',
+                data: [''],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            responsive: true,
+        }
+    };
+
+    window.myChart = new Chart(ctx, config);
+
+    var ctx1 = document.getElementById('myChart1').getContext('2d');
+    var config1 = {
+        type: 'pie',
+        data: {
+            labels: [''],
+            datasets: [{
+                label: '',
+                data: [''],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            responsive: true,
+        }
+    };
+    window.myChart1 = new Chart(ctx1, config1);
+
+    let criteria = {
+        budgetID: {{ budgetID }},
+        categoryType: 0
+    };
+
+    dataUpdate(criteria);
+
+    $(document).on('click', '.preview-dataType', function () {
+        let criteria = {
+            budgetID: {{ budgetID }},
+            categoryType: $(this).attr('data-categorytype')
+        };
+
+        dataUpdate(criteria);
+    });
+
+    function dataUpdate(data){
+        let outputMessage = $('.result-message');
+        $.ajax({
+            type: "POST",
+            url: '{{ path('app_budegt_schedule_preview_data') }}',
+            data: data,
+            global: false,
+            cache: false
+        }).done(function (response) {
+            if(response.result === true){
+                outputMessage.html('');
+                $('.budsafes-chart-preview-category-name').html(response.label);
+                $('.budsafes-chart-preview-totalMonth > span:nth-child(2)').html(response.totalAmount['month']+' €');
+                $('.budsafes-chart-preview-totalYear > span:nth-child(2)').html(response.totalAmount['year']+'  €');
+                $('.budsafes-chart-preview-cashRemain-month > span:nth-child(2)').html(response.cashRemain['month']+' €');
+                $('.budsafes-chart-preview-cashRemain-year > span:nth-child(2)').html(response.cashRemain['year']+' €');
+                config.data.labels = response.labels;
+                config1.data.labels = response.labels;
+
+                config.data.datasets[0].label = response.label;
+                config1.data.datasets[0].label = response.label;
+
+                config.data.datasets[0].data = response.data;
+                config1.data.datasets[0].data = response.data;
+
+                window.myChart.update();
+                window.myChart1.update();
+            }else{
+                outputMessage.css('color', '#ef172c');
+                outputMessage.html(response.message);
+            }
+        });
+    }
+
+    $('.chart-container').css({
+        'width': '400px',
+        'height': '400px'
+    });
+</script>
+{% endblock %}
+{% endblock %}

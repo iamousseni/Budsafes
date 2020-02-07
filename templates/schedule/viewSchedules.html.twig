@@ -1,0 +1,334 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Sei sicuro di voler cancellare questa Schedule Track?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex align-items-center justify-content-center">
+          <div class="mr-3 modal-delete-image-container">
+            <img src="https://media2.giphy.com/media/3oz8y0bx23FDPCNoEU/giphy.gif">
+          </div>
+          <div>
+            <p class="modal-delete-text">Ti ricordo che questa operazione è irreversibile, pertanto proseguendo non sarà
+              più possibile tornare indietro!</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Non cancellare questa Schedule Track</button>
+        <button type="button" class="btn btn-danger" id="confirm-delete-schedule-track" data-dismiss="modal">Cancella questa Schedule Track</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="budsafes-category-container">
+  <div>
+    <a href="{{ path('app_budgets') }}"> <button class="btn btn-outline-secondary rounded-button m-2"><i class="fas fa-arrow-left"></i> Back </button> </a>
+    <a href="{{ path('app_budget_category', { budgetName: budget.name | lower , budget_id: budget.id } ) }}"> <button class="btn btn-primary rounded-button m-2">Categorie dello Schedule</button> </a>
+    <a href="{{ path('app_budget_schedule_preview', {budget_id: budget.id}) }}"> <button class="btn btn btn-info rounded-button m-2"><i class="fas fa-chart-bar"></i> Preview </button> </a>
+  </div>
+  <div class="budsafes-category-income">
+    <p class="budsafes-business-track-month">Entrate</p>
+    <span class="result-message font-weight-bold"></span>
+    <table class="table">
+      <thead class="thead-light">
+      <tr>
+        <th colspan="8">Schedule Entrate</th>
+        <th class="p-0"><button class="budsafes-schedule-add-button income">+</button></th>
+      </tr>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nome</th>
+        <th scope="col">Descrizione</th>
+        <th scope="col">Importo</th>
+        <th scope="col">Valuta</th>
+        <th scope="col">Primo acconto</th>
+        <th scope="col">Ciclo</th>
+        <th scope="col">Modifica</th>
+        <th scope="col">Elimina</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for scheduleIncome in scheduleIncomes %}
+        <tr data-schedule="{{ scheduleIncome.id }}">
+          <th scope="row">{{ loop.index }}</th>
+          <td data-category="{{ scheduleIncome.category.id }}">{{ scheduleIncome.category.name }}</td>
+          <td>{{ scheduleIncome.description }}</td>
+          <td>{{ scheduleIncome.amount }}</td>
+          <td data-currency="{{ scheduleIncome.currency.id }}">{{ scheduleIncome.currency.symbol }}</td>
+          <td data-firstInvoice="{{ scheduleIncome.firstInvoice.date | date('d/m/Y') }}">{{ scheduleIncome.firstInvoice.date | date('d/m/Y') }}</td>
+          <td data-cycle="{{ scheduleIncome.cycle }}">
+            {% if scheduleIncome.cycle is same as(0) %}
+              Annuale
+            {% elseif scheduleIncome.cycle is same as(1) %}
+              Mensile
+            {% elseif scheduleIncome.cycle is same as(2) %}
+              Semestrale
+            {% endif %}
+          </td>
+          <td class="editSchedule" data-type="0"><i class="far fa-edit edit"></i></td>
+          <td class="deleteSchedule" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-trash-alt trash"></i></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="budsafes-category-income">
+    <p class="budsafes-business-track-month">Uscite</p>
+    <span class="result-message font-weight-bold"></span>
+    <table class="table">
+      <thead class="thead-light">
+      <tr>
+        <th colspan="8">Schedule Uscite</th>
+        <th class="p-0"><button class="budsafes-schedule-add-button outcome">+</button></th>
+      </tr>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nome</th>
+        <th scope="col">Descrizione</th>
+        <th scope="col">Importo</th>
+        <th scope="col">Valuta</th>
+        <th scope="col">Primo acconto</th>
+        <th scope="col">Ciclo</th>
+        <th scope="col">Modifica</th>
+        <th scope="col">Elimina</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for scheduleOutcome in scheduleOutcomes %}
+        <tr data-schedule="{{ scheduleOutcome.id }}">
+          <th scope="row">{{ loop.index }}</th>
+          <td data-category="{{ scheduleOutcome.category.id }}">{{ scheduleOutcome.category.name }}</td>
+          <td>{{ scheduleOutcome.description }}</td>
+          <td>{{ scheduleOutcome.amount }}</td>
+          <td data-currency="{{ scheduleOutcome.currency.id }}">{{ scheduleOutcome.currency.symbol }}</td>
+          <td data-firstInvoice="{{ scheduleOutcome.firstInvoice.date | date('d/m/Y') }}">{{ scheduleOutcome.firstInvoice.date | date('d/m/Y') }}</td>
+          <td data-cycle="{{ scheduleOutcome.cycle }}">
+            {% if scheduleOutcome.cycle is same as(0) %}
+              Annuale
+            {% elseif scheduleOutcome.cycle is same as(1) %}
+              Mensile
+            {% elseif scheduleOutcome.cycle is same as(2) %}
+              Semestrale
+            {% endif %}
+          </td>
+          <td class="editSchedule" data-type="1"><i class="far fa-edit edit"></i></td>
+          <td class="deleteSchedule" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-trash-alt trash"></i></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="budsafes-category-income">
+    <p class="budsafes-business-track-month">Risparmi</p>
+    <span class="result-message font-weight-bold"></span>
+    <table class="table">
+      <thead class="thead-light">
+      <tr>
+        <th colspan="8">Schedule Risparmi</th>
+        <th class="p-0"><button class="budsafes-schedule-add-button saves">+</button></th>
+      </tr>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nome</th>
+        <th scope="col">Descrizione</th>
+        <th scope="col">Importo</th>
+        <th scope="col">Valuta</th>
+        <th scope="col">Primo acconto</th>
+        <th scope="col">Ciclo</th>
+        <th scope="col">Modifica</th>
+        <th scope="col">Elimina</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for scheduleSave in scheduleSaves %}
+        <tr data-schedule="{{ scheduleSave.id }}">
+          <th scope="row">{{ loop.index }}</th>
+          <td data-category="{{ scheduleSave.category.id }}">{{ scheduleSave.category.name }}</td>
+          <td>{{ scheduleSave.description }}</td>
+          <td>{{ scheduleSave.amount }}</td>
+          <td data-currency="{{ scheduleSave.currency.id }}">{{ scheduleSave.currency.symbol }}</td>
+          <td data-firstInvoice="{{ scheduleSave.firstInvoice.date | date('d/m/Y') }}">{{ scheduleSave.firstInvoice.date | date('d/m/Y') }}</td>
+          <td data-cycle="{{ scheduleSave.cycle }}">
+            {% if scheduleSave.cycle is same as(0) %}
+              Annuale
+            {% elseif scheduleSave.cycle is same as(1) %}
+              Mensile
+            {% elseif scheduleSave.cycle is same as(2) %}
+              Semestrale
+            {% endif %}
+          </td>
+          <td class="editSchedule" data-type="2"><i class="far fa-edit edit"></i></td>
+          <td class="deleteSchedule" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-trash-alt trash"></i></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+{% block javascripts %}
+  {{ parent() }}
+  <script src="{{ asset('assets/js/Budsafes.js') }}"></script>
+  <script>
+    let budsafes = new Budsafes();
+    $('.budsafes-schedule-add-button.income').click(function () {
+      let elementToAppend = $(this).parent().parent().parent().next();
+      let URLNewRow = "{{ path('app_budsafes_new_row_schedule') }}";
+      let numLastRow = Number($.trim(elementToAppend.children('tr:last-child').children('th:first-child').text()));
+      let budgetID = {{ budgetID }};
+      let criteria = {
+        numLastRow: numLastRow + 1,
+        type: 0,
+        budget: budgetID,
+      };
+      budsafes.newRow(elementToAppend, URLNewRow, criteria);
+    });
+
+    $('.budsafes-schedule-add-button.outcome').click(function () {
+      let elementToAppend = $(this).parent().parent().parent().next();
+      let URLNewRow = "{{ path('app_budsafes_new_row_schedule') }}";
+      let numLastRow = Number($.trim(elementToAppend.children('tr:last-child').children('th:first-child').text()));
+      let budgetID = {{ budgetID }};
+      let criteria = {
+        numLastRow: numLastRow + 1,
+        type: 1,
+        budget: budgetID,
+      };
+      budsafes.newRow(elementToAppend, URLNewRow, criteria);
+    });
+
+    $('.budsafes-schedule-add-button.saves').click(function () {
+      let elementToAppend = $(this).parent().parent().parent().next();
+      let URLNewRow = "{{ path('app_budsafes_new_row_schedule') }}";
+      let numLastRow = Number($.trim(elementToAppend.children('tr:last-child').children('th:first-child').text()));
+      let budgetID = {{ budgetID }};
+      let criteria = {
+        numLastRow: numLastRow + 1,
+        type: 2,
+        budget: budgetID,
+      };
+      budsafes.newRow(elementToAppend, URLNewRow, criteria);
+    });
+
+    $(document).on('click', '.saveNewSchedule', function () {
+      let rowTemp = $('.new-row');
+      let elementToAppend = $(this).parent().parent().parent();
+      let outputElement = elementToAppend.parent().prev();
+      let categoryID = rowTemp.find('[name=category]').val();
+      let description = rowTemp.find('[name=description]').val();
+      let amount = rowTemp.find('[name=amount]').val();
+      let currency = rowTemp.find('[name=currency]').val();
+      let cycle = rowTemp.find('[name=cycle]').val();
+      let firstInvoice = rowTemp.find('input[name=firstInvoice]').val();
+      firstInvoice = firstInvoice.split('/').reverse().join('/')+' 00:00';
+      let URLNewRow = "{{ path('app_budsafes_new_schedule') }}";
+
+      let criteria = {
+        idCategory: categoryID,
+        idCurrency: currency,
+        amount: amount,
+        description: description,
+        firstInvoice: firstInvoice,
+        cycle: cycle,
+      };
+
+      budsafes.saveNewRow(elementToAppend, outputElement, URLNewRow, criteria);
+    });
+
+    $(document).on('click', '.editSchedule', function () {
+      let schedule = $(this).parent();
+      let elementToAppend = $(this).parent().parent().parent().next();
+      let URLNewRow = "{{ path('app_budsafes_new_row_schedule') }}";
+      let numLastRow = Number($.trim(schedule.find('th[scope=row]').text()));
+      let budgetID = {{ budgetID }};
+      let type = $(this).attr('data-type');
+      let cycle = schedule.find('td[data-cycle]').attr('data-cycle');
+      let firstInvoice = schedule.find('td[data-firstInvoice]').attr('data-firstInvoice');
+      firstInvoice = firstInvoice.split('/').reverse().join('/')+' 00:00';
+      let currency = schedule.find('td[data-currency]').attr('data-currency');
+      let amount = $(this).prev().prev().prev().prev().text();
+      let description = $(this).prev().prev().prev().prev().prev().text();
+      let category = schedule.find('td[data-category]').attr('data-category');
+      
+      let criteria = {
+        scheduleID: schedule.attr('data-schedule'),
+        numLastRow: numLastRow,
+        type: type,
+        budget: budgetID,
+        categoryID: category,
+        description: description,
+        amount: amount,
+        firstInvoice: firstInvoice,
+        cycle: cycle,
+        currencyID: currency,
+      };
+
+      budsafes.editRow(schedule, URLNewRow, criteria);
+    });
+    
+    $(document).on('click', '.saveEditSchedule', function () {
+      let rowTemp = $('.new-row');
+      let elementToAppend = $(this).parent().parent().parent();
+      let outputElement = elementToAppend.parent().prev();
+      let categoryID = rowTemp.find('[name=category]').val();
+      let description = rowTemp.find('[name=description]').val();
+      let amount = rowTemp.find('[name=amount]').val();
+      let currency = rowTemp.find('[name=currency]').val();
+      let cycle = rowTemp.find('[name=cycle]').val();
+      let firstInvoice = rowTemp.find('input[name=firstInvoice]').val();
+      firstInvoice = firstInvoice.split('/').reverse().join('/')+' 00:00';
+      let schedule = $(this).attr('data-schedule');
+      let URLEditRow = "{{ path('app_budsafes_schedule_edit') }}";
+
+      let criteria = {
+        id: schedule,
+        idCategory: categoryID,
+        idCurrency: currency,
+        amount: amount,
+        description: description,
+        firstInvoice: firstInvoice,
+        cycle: cycle,
+      };
+
+      budsafes.saveEditRow(elementToAppend, outputElement, URLEditRow, criteria);
+    });
+    
+    $(document).on('click', '.deleteSchedule', function () {
+      let confirmDeleteButton = $('#confirm-delete-schedule-track');
+      let schedule = $(this).parent();
+      let scheduleID = schedule.attr('data-schedule');
+      let scheduleIndex = $('tr').index(schedule);
+      let outputElement = schedule.parent().parent().prev();
+      let outputElementIndex = $('span.result-message').index(outputElement);
+      confirmDeleteButton.attr('data-scheduleIndex', scheduleIndex);
+      confirmDeleteButton.attr('data-outputIndex', outputElementIndex);
+    });
+    
+    $(document).on('click', '#confirm-delete-schedule-track', function () {
+      
+      let scheduleElement = $($('tr').get($(this).attr('data-scheduleIndex')));
+      let outputElement = $($('span.result-message').get($(this).attr('data-outputIndex')));
+      let schedule = scheduleElement.attr('data-schedule');
+      let URLDeleteRow = "{{ path('app_budsafes_schedule_delete') }}";
+      let criteria = {
+        id: schedule,
+      };
+      
+      budsafes.deleteRow(scheduleElement, outputElement, URLDeleteRow, criteria);
+    });
+    
+    $(document).on('click', '.deleteNewSchedule', function () {
+      let newElementToDelete = $(this).parent().parent();
+      budsafes.deleteNewRow(newElementToDelete);
+    });
+  </script>
+{% endblock %}

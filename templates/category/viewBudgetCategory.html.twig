@@ -1,0 +1,351 @@
+  {% extends 'base.html.twig' %}
+{% block content %}
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Sei sicuro di voler cancellare questa categoria?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex align-items-center justify-content-center">
+            <div class="mr-3 modal-delete-image-container">
+              <img src="https://media2.giphy.com/media/3oz8y0bx23FDPCNoEU/giphy.gif">
+            </div>
+            <div>
+              <p class="modal-delete-text">Cancellando questa categoria cancellerai anche tutti i dati della Business Tracking e
+                delle Schedule che richiedevano questa categoria!</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Non cancellare questa categoria</button>
+          <button type="button" class="btn btn-danger" id="confirm-delete-category" data-dismiss="modal">Cancella questa categoria</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="newCategoryModal" tabindex="-1" role="dialog" aria-labelledby="newCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="newCategoryModalLabel">Aggiungi una nuova categoria</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <span class="result-message font-weight-bold"></span>
+          <form id="form-add-new-category">
+            <div class="form-group">
+              <label for="exampleFormControlInput1">Nome categoria</label>
+              <input type="text" class="form-control" id="exampleFormControlInput1" name="categoryName" placeholder="Nome categoria" autocomplete="off" required>
+            </div>
+            <div class="form-group">
+              <label for="exampleFormControlSelect1">Stato</label>
+              <select class="form-control" id="exampleFormControlSelect1" name="status" required>
+                <option value="1">Attivo</option>
+                <option value="0">Disattivo</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="exampleFormControlSelect2">Tipologia</label>
+              <select class="form-control" id="exampleFormControlSelect2" name="type" required>
+                <option value="0">Entrate</option>
+                <option value="1">Uscite</option>
+                <option value="2">Risparmi</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Non aggiungere nuova categoria</button>
+          <button type="button" class="btn btn-danger" id="add-new-category">Aggiungi nuova categoria</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="budsafes-category-container">
+    <div>
+      <a href="{{ path('app_budget_schedule', {budgetID: budget.id }) }}"> <button class="btn btn-outline-secondary rounded-button m-2"><i class="fas fa-arrow-left"></i> Back </button> </a>
+      <button class="btn btn-primary rounded-button m-2" data-toggle="modal" data-target="#newCategoryModal">Aggiungi una nuova categoria</button>
+    </div>
+    {% if incomes is not empty %}
+    <div class="budsafes-category-income">
+      <p class="budsafes-business-track-month">Entrate</p>
+      <span class="result-message font-weight-bold"></span>
+      <table class="table">
+        <thead class="thead-light">
+          <tr>
+            <th colspan="4">Categorie Entrate</th>
+            <th class="p-0"><button class="budsafes-business-track-add-button income">+</button></th>
+          </tr>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Stato</th>
+            <th scope="col">Modifica</th>
+            <th scope="col">Elimina</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for income in incomes %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ income.name }}</td>
+            {% if income.status is same as(1) %}
+              <td data-status="{{ income.status }}"><i class="fas fa-circle status-active"></i> <span> Attivo</span></td>
+            {% else %}
+              <td data-status="{{ income.status }}"><i class="fas fa-circle status-inactive"></i> <span> Disattivo</span></td>
+            {% endif %}
+            <td class="editCategory" data-categoryID="{{ income.id }}" data-budgetID="{{ budget.id }}" data-type="{{ income.type }}"><i class="far fa-edit edit"></i></td>
+            <td class="deleteCategory" data-categoryID="{{ income.id }}" data-budgetID="{{ budget.id }}" data-type="{{ income.type }}" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-trash-alt trash"></i></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+    
+  {% if outcomes is not empty %}
+    <div class="budsafes-category-income">
+      <p class="budsafes-business-track-month">Uscite</p>
+      <span class="result-message font-weight-bold"></span>
+      <table class="table">
+        <thead class="thead-light">
+        <tr>
+          <th colspan="4">Categorie Uscite</th>
+          <th class="p-0"><button class="budsafes-business-track-add-button outcome">+</button></th>
+        </tr>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Nome</th>
+          <th scope="col">Stato</th>
+          <th scope="col">Modifica</th>
+          <th scope="col">Elimina</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for outcome in outcomes %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ outcome.name }}</td>
+            {% if outcome.status is same as(1) %}
+              <td data-status="{{ outcome.status }}"><i class="fas fa-circle status-active"></i> <span> Attivo</span></td>
+            {% else %}
+              <td data-status="{{ outcome.status }}"><i class="fas fa-circle status-inactive"></i> <span> Disattivo</span></td>
+            {% endif %}
+            <td class="editCategory" data-categoryID="{{ outcome.id }}" data-budgetID="{{ budget.id }}" data-type="{{ outcome.type }}"><i class="far fa-edit edit"></i></td>
+            <td class="deleteCategory" data-categoryID="{{ outcome.id }}" data-budgetID="{{ budget.id }}" data-type="{{ outcome.type }}" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-trash-alt trash"></i></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+  
+    {% if saves is not empty %}
+    <div class="budsafes-category-income">
+      <p class="budsafes-business-track-month">Risparmi</p>
+      <span class="result-message font-weight-bold"></span>
+      <table class="table">
+        <thead class="thead-light">
+        <tr>
+          <th colspan="4">Categorie Risparmi</th>
+          <th class="p-0"><button class="budsafes-business-track-add-button saves">+</button></th>
+        </tr>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Nome</th>
+          <th scope="col">Stato</th>
+          <th scope="col">Modifica</th>
+          <th scope="col">Elimina</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for save in saves %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ save.name }}</td>
+            {% if save.status is same as(1) %}
+              <td data-status="{{ save.status }}"><i class="fas fa-circle status-active"></i> <span> Attivo</span></td>
+            {% else %}
+              <td data-status="{{ save.status }}"><i class="fas fa-circle status-inactive"></i> <span> Disattivo</span></td>
+            {% endif %}
+            <td class="editCategory" data-categoryID="{{ save.id }}" data-budgetID="{{ budget.id }}" data-type="{{ save.type }}"><i class="far fa-edit edit"></i></td>
+            <td class="deleteCategory" data-categoryID="{{ save.id }}" data-budgetID="{{ budget.id }}" data-type="{{ save.type }}" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-trash-alt trash"></i></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </div>
+{% endblock %}
+{% block javascripts %}
+  {{ parent() }}
+  <script src="{{ asset('assets/js/Budsafes.js') }}"></script>
+  <script>
+    let budsafes = new Budsafes();
+    
+    $('#add-new-category').click(function () {
+      let URLNewRow = "{{ path('app_budsafes_new_category') }}";
+      let form = $('#form-add-new-category');
+      let categoryName = form.find('input[name="categoryName"]').val();
+      let status = form.find('select[name="status"]').val();
+      let type = form.find('select[name="type"]').val();
+      
+      if(type !== '' && categoryName !== '' && status !== '') {
+        let criteria = {
+          type: type,
+          status: status,
+          name: categoryName,
+          budget: {{ budget.id }}
+        };
+        budsafes.saveNewRow(null, form.prev(), URLNewRow, criteria, true);
+      }else {
+        form.prev().css('color', '#ef172c');
+        form.prev().text('Errore, controlla i dati inseriti');
+      }
+    });
+    
+    $('.budsafes-business-track-add-button.income').click(function () {
+      
+      let elementToAppend = $(this).parent().parent().parent().next();
+      let URLNewRow = "{{ path('app_budsafes_new_row_category') }}";
+      let numLastRow = Number($.trim(elementToAppend.children('tr:last-child').children('th:first-child').text()));
+      let criteria = {
+        numLastRow: numLastRow + 1,
+        type: 0,
+      };
+      budsafes.newRow(elementToAppend, URLNewRow, criteria);
+    });
+
+    $('.budsafes-business-track-add-button.outcome').click(function () {
+      let elementToAppend = $(this).parent().parent().parent().next();
+      let URLNewRow = "{{ path('app_budsafes_new_row_category') }}";
+      let numLastRow = Number($.trim(elementToAppend.children('tr:last-child').children('th:first-child').text()));
+      let criteria = {
+        numLastRow: numLastRow + 1,
+        type: 1,
+      };
+      budsafes.newRow(elementToAppend, URLNewRow, criteria);
+    });
+
+    $('.budsafes-business-track-add-button.saves').click(function () {
+      let elementToAppend = $(this).parent().parent().parent().next();
+      let URLNewRow = "{{ path('app_budsafes_new_row_category') }}";
+      let numLastRow = Number($.trim(elementToAppend.children('tr:last-child').children('th:first-child').text()));
+      let criteria = {
+        numLastRow: numLastRow + 1,
+        type: 2,
+      };
+      budsafes.newRow(elementToAppend, URLNewRow, criteria);
+    });
+    
+    $(document).on('click', '.saveNewCategory', function () {
+      $('.saveNewCategory').each(function () {
+        let elementToAppend = $(this).parent().parent().parent();
+        let outputElement = elementToAppend.parent().prev();
+        let URLNewRow = "{{ path('app_budsafes_new_category') }}";
+        let type = $(this).parent().prev().prev().children('input[type=text]').attr('data-type');
+        let categoryName = $(this).parent().prev().prev().children('input').val();
+        let status = $(this).parent().prev().children('select').val();
+        let criteria = {
+          type: type,
+          status: status,
+          name: categoryName,
+          budget: {{ budget.id }}
+        };
+        budsafes.saveNewRow(elementToAppend, outputElement, URLNewRow, criteria);
+      });
+    });
+
+    $(document).on('click', '.deleteNewCategory', function () {
+      let elementContainer = $(this).parent().parent();
+      budsafes.deleteNewRow(elementContainer);
+    });
+
+    $(document).on('keyup', '.newRowCategoryInput', function () {
+      //remove class to this element
+      $(this).removeClass('newRowCategoryInput');
+      
+      let elementToAppend = $(this).parent().parent().parent();
+      let URLNewRow = "{{ path('app_budsafes_new_row_category') }}";
+      let numLastRow = Number($.trim(elementToAppend.children('tr:last-child').children('th:first-child').text()));
+      let type = $(this).attr('data-type');
+      let criteria = {
+        numLastRow: numLastRow + 1,
+        type: type,
+      };
+      budsafes.newRow(elementToAppend, URLNewRow, criteria);
+    });
+    
+    $(document).on('click', '.editCategory', function (){
+      let type = $(this).attr('data-type');
+      let elementToReplace = $(this).parent();
+      let URLEditRow = "{{ path('app_budsafes_new_row_category') }}";
+      let numLastRow = $.trim($(this).prev().prev().prev().text());
+      let categoryName = $(this).prev().prev().text();
+      let categoryID = $(this).attr('data-categoryID');
+      
+      let criteria = {
+        numLastRow: numLastRow,
+        type: type,
+        name: categoryName,
+        categoryID: categoryID,
+      };
+      budsafes.editRow(elementToReplace, URLEditRow, criteria);
+    });
+
+    $(document).on('click', '.saveEditCategory', function (){
+      let type = $(this).parent().prev().prev().children('input[type=text]').attr('data-type');
+      let URLSaveEditRow = "{{ path('app_budsafes_edit_category') }}";
+      let elementToAppend = $(this).parent().parent().parent();
+      let outputElement = elementToAppend.parent().prev();
+      let categoryName = $(this).parent().prev().prev().children('input[type=text]').val();
+      let status = $(this).parent().prev().children('select').val();
+      let categoryID = $(this).attr('data-categoryID');
+
+      let criteria = {
+        type: type,
+        name: categoryName,
+        id: categoryID,
+        status: status,
+        budget: {{ budget.id }},
+      };
+
+      budsafes.saveEditRow(elementToAppend, outputElement, URLSaveEditRow, criteria);
+    });
+
+    $(document).on('click', '.deleteCategory', function (event){
+      let btnConfirmDelete = $('#confirm-delete-category');
+      let category = $(this).attr('data-categoryID');
+      let elementToDelete = $(this).parent();
+      let elementToDeleteIndexOf = $('tr').index(elementToDelete);
+      let outputElement = $(this).parent().parent().parent().prev();
+      let outputElementIndexOf = $('span.result-message').index(outputElement);
+
+      btnConfirmDelete.attr('data-category', category);
+      btnConfirmDelete.attr('data-elementToDelete', elementToDeleteIndexOf);
+      btnConfirmDelete.attr('data-outputElement', outputElementIndexOf);
+    });
+
+    $(document).on('click', '#confirm-delete-category', function () {
+      let URLDeleteRow = "{{ path('app_budsafes_delete_category') }}";
+      let category = $(this).attr('data-category');
+      let elementoToDelete = $($('tr').get($(this).attr('data-elementToDelete')));
+      let outputElement = $($('span.result-message').get($(this).attr('data-outputElement')));
+      let criteria = {
+        id: category,
+      };
+     
+      budsafes.deleteRow(elementoToDelete, outputElement, URLDeleteRow, criteria);
+    });
+  </script>
+{% endblock %}

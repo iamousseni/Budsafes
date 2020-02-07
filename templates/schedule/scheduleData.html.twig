@@ -1,0 +1,21 @@
+{% for schedule in schedules %}
+  <tr data-schedule="{{ schedule.id }}">
+    <th scope="row">{{ loop.index }}</th>
+    <td data-category="{{ schedule.category.id }}">{{ schedule.category.name }}</td>
+    <td>{{ schedule.description }}</td>
+    <td>{{ schedule.amount }}</td>
+    <td>{{ schedule.currency.symbol }}</td>
+    <td data-firstInvoice="{{ schedule.firstInvoice.date | date('d/m/Y') }}">{{ schedule.firstInvoice.date | date('d/m/Y') }}</td>
+    <td>
+      {% if schedule.cycle is same as(0) %}
+        Annuale
+      {% elseif schedule.cycle is same as(1) %}
+        Mensile
+      {% elseif schedule.cycle is same as(2) %}
+        Semestrale
+      {% endif %}
+    </td>
+    <td class="editSchedule"><i class="far fa-edit edit"></i></td>
+    <td class="deleteSchedule" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-trash-alt trash"></i></td>
+  </tr>
+{% endfor %}

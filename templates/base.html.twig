@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>{% block title %}{{ title }}!{% endblock %}</title>
+  {% block stylesheets %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ asset('https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css') }}"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- budsafes CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+  {% endblock %}
+</head>
+<body>
+{% block body %}
+  <div class="budsafes-container">
+    <div class="budsafes-asidebar">
+      <div class="budsafes-asidebar-header">
+        <div class="card card-stats card-primary card-round budsafes-boxup d-flex flex-row align-items-center">
+          <div class="budsafes-logo-container mr-3">
+            <img src="{{ asset('assets/images/runtheons.png') }}">
+          </div>
+          <div class="budsafes-brandname">
+            <h3>Budsafes</h3>
+          </div>
+        </div>
+        <div class="budsafes-newbudget-container d-flex flex-row align-items-center">
+          <button class="mr-3 budsafes-boxup" data-toggle="modal" data-target="#newBuinessTrackModal">+</button>
+          <h3 data-toggle="modal" data-target="#newBuinessTrackModal">New</h3>
+        </div>
+      </div>
+      <hr class="budsafes-break">
+      <div class="budsafes-menu-container">
+        <ul>
+          <li class="budsafes-list-item active">
+            <a href="{{ path('app_budget') }}"> <i class="fas fa-home"></i><span>Home</span> </a>
+          </li>
+          <li class="budsafes-list-item">
+            <a href="{{ path('app_budgets') }}"> <i class="fas fa-money-check-alt"></i><span>Budgets</span> </a>
+          </li>
+          <li class="budsafes-share-container">
+            <div class="budsafes-share">
+              <div>
+                <img src="{{ asset('assets/images/handphone.png') }}">
+              </div>
+              <div>
+                <p>Ti piace Budsafes?</p>
+                <p>Condividila con i tuoi amici!</p>
+              </div>
+              <hr class="budsafes-break">
+              <div class="budsafes-socialmenu-container">
+                <ul class="budsafes-socialmenu">
+                  <li>
+                    <a href=""><i class="fab fa-instagram instagram"></i></a>
+                  </li>
+                  <li>
+                    <a href=""><i class="fab fa-facebook-f facebook"></i></a>
+                  </li>
+                  <li>
+                    <a href=""><i class="fab fa-twitter twitter"></i></a>
+                  </li>
+                  <li>
+                    <a href=""><i class="fab fa-linkedin-in linkedin"></i></a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </li>
+          <li class="budsafes-list-item">
+            <i class="fas fa-user-cog"></i><span>Setting Profile</span>
+          </li>
+        </ul>
+      </div>
+      <div class="googlead-container">
+       <a href="https://www.buddybank.com/it/"><img src="{{ asset('assets/images/buddybank-logo.jpg') }}"></a>
+      </div>
+    </div>
+    <div class="budsafes-content card card-stats card-primary card-round budsafes-boxup">
+      <div class="budsafes-content-header d-flex flex-row align-items-center">
+        <div>
+          <h3>{{ pageName }}</h3>
+        </div>
+      </div>
+      <hr class="budsafes-break">
+      {% block content %}
+
+      {% endblock %}
+    </div>
+  </div>
+
+
+{% endblock %}
+{% block javascripts %}
+  <!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="{{ asset('https://code.jquery.com/jquery-3.2.1.slim.min.js') }}"
+integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="{{ asset('https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js') }}"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="{{ asset('https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js') }}"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<!-- Fotawesome -->
+<script src="{{ asset('https://kit.fontawesome.com/bee94aa91a.js') }}" crossorigin="anonymous"></script>
+<!-- budsafes script -->
+  <script src="{{ asset('https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js') }}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+  <link rel="stylesheet"
+        href="https://rawgit.com/Eonasdan/bootstrap-datetimepicker/master/build/css/bootstrap-datetimepicker.min.css">
+  <script src="https://rawgit.com/Eonasdan/bootstrap-datetimepicker/master/build/js/bootstrap-datetimepicker.min.js"></script>
+<script src="{{ asset('assets/js/script.js') }}"></script>
+{% endblock %}
+</body>
+</html>

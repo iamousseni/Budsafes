@@ -1,0 +1,87 @@
+<div class="budsafes-percentualCategory-filter-category-container">
+    <ul class="nav nav-pills budsfes-percentual-setting">
+        <li class="nav-item">
+            <button class="btn btn-primary rounded-button" id="percentual-chart">Grafici <i class="fas fa-chart-bar" aria-hidden="true"></i></button>
+        </li>
+        <li class="nav-item">
+            <button class="btn btn-info rounded-button" id="all-percentual">Tutte le categorie</button>
+        </li>
+        {% for category in percentualsSpentCategories %}
+            {% if category.type is same as('0') %}
+                <li class="nav-item"><button class="btn btn-outline-success rounded-button" id="income-percentual">Entrate <i class="fas fa-arrow-up income"></i></button></li>
+            {% elseif category.type is same as('1') %}
+                <li class="nav-item"><button class="btn btn-outline-danger rounded-button" id="outcome-percentual">Uscite <i class="fas fa-arrow-down outcome"></i></button></li>
+            {% elseif category.type is same as('2') %}
+                <li class="nav-item"><button class="btn btn-outline-piggyBank rounded-button" id="saves-percentual">Risparmi <i class="fas fa-piggy-bank piggyBank"></i></button></li>
+            {% endif %}
+        {% endfor %}
+        <li class="nav-item">
+            <div class="input-group">
+                <select class="custom-select rounded-button" id="percentual-spent-months">
+                    {% for month, businessTraffic in businessTrafficsData %}
+                        {% if month | date('m') == "now" | date('m') %}
+                            <option value="{{ "now" | date('m') }}" selected>{{ "now" | date('F') }}</option>
+                        {% else %}
+                            <option value="{{ month | date('m') }}">{{ month | date('F') }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </li>
+    </ul>
+</div>
+<div class="budsafes-percentualCategory-container">
+    <span class="font-weight-bold fs-18">Soldi ancora da spendere: {{ totalCashRemainToSpent }} € </span>
+{% for percentualSpentCategory in percentualsSpentCategories %}
+    <div class="budsafes-percentualCategory-innerContainer">
+        <div>
+            <h1>
+                {% if percentualSpentCategory.type == 0 %}
+                    Entrate
+                {% elseif percentualSpentCategory.type == 1 %}
+                    Uscite
+                {% elseif percentualSpentCategory.type == 2 %}
+                    Risparmi
+                {% endif %}
+            </h1>
+            <span>Totale
+                {% if percentualSpentCategory.type == 0 %}
+                    Entrate:
+                {% elseif percentualSpentCategory.type == 1 %}
+                    Uscite:
+                {% elseif percentualSpentCategory.type == 2 %}
+                    Risparmi:
+                {% endif %}
+            </span>
+            <span>{{ percentualSpentCategory.totalSpent }}€</span>
+        </div>
+        {% for category in percentualSpentCategory.categoriesSpent %}
+            <div data-categoryid="{{ category.id }}" class="budsafes-percentualCategory">
+                <div>
+                    <span>{{ category.name }}</span><span class="font-weight-bold"> ({{ category.totAmountCategorySpent }}€)</span>
+                </div>
+                <div class="budsafes-percentualCategory-progress-container">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-animated progress-bar-striped
+                            {% if category.percentualSpentCategory < 50 and category.type == 1 %} bg-success {% elseif category.percentualSpentCategory >= 50 and category.percentualSpentCategory <= 100 and category.type == 1 %} bg-warning {% elseif category.percentualSpentCategory > 100 and category.type ==  1 %} bg-danger {% endif %}
+                            {% if category.percentualSpentCategory >= 100 and category.type == 0 %} bg-success {% elseif category.percentualSpentCategory <= 50 and category.type == 0 %} bg-warning {% elseif category.percentualSpentCategory < 50 and category.type ==  0 %} bg-danger {% endif %}
+                            {% if category.percentualSpentCategory >= 100 and category.type == 2 %} bg-success {% elseif category.percentualSpentCategory <= 50 and category.type == 2 %} bg-warning {% elseif category.percentualSpentCategory < 50 and category.type ==  2 %} bg-danger {% endif %}
+                             " role="progressbar" style="width: {{ category.percentualSpentCategory }}%" aria-valuenow="{{ category.percentualSpentCategory }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div>
+                        <span>{{ category.percentualSpentCategory }}%</span>
+                        <span>(
+                            {% if category.cashRemainToSpent > 0 %}
+                                +{{ category.cashRemainToSpent }} €
+                            {% else %}
+                                {{ category.cashRemainToSpent }} €
+                            {% endif %}
+                                )
+                        </span>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}
+</div>
